@@ -10,6 +10,7 @@ import SettingsPlanBeta from "./SettingsPlanBeta";
 import SettingsSlackBeta from "./SettingsSlackBeta";
 import SettingsSMSBeta from "./SettingsSMSBeta";
 import SettingsTeamBeta from "./SettingsTeamBeta";
+import RenderWhenOn from "components/splitFeature/RenderWhenOn";
 
 enum TabName {
   ACCOUNT = "Account",
@@ -85,18 +86,23 @@ const Settings = () => {
                       <div className="border-b border-gray-200">
                         <nav className="-mb-px flex space-x-8">
                           {Object.keys(tabComponents).map((tab) => (
-                            <div
+                            <RenderWhenOn
+                              featureName={`settings-${tab.toLowerCase()}`}
                               key={tab}
-                              className={classNames(
-                                tab === currentTab
-                                  ? "border-cyan-500 text-cyan-600"
-                                  : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
-                                "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer"
-                              )}
-                              onClick={() => setCurrentTab(tab as TabName)}
                             >
-                              {tab}
-                            </div>
+                              <div
+                                key={tab}
+                                className={classNames(
+                                  tab === currentTab
+                                    ? "border-cyan-500 text-cyan-600"
+                                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                                  "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm cursor-pointer"
+                                )}
+                                onClick={() => setCurrentTab(tab as TabName)}
+                              >
+                                {tab}
+                              </div>
+                            </RenderWhenOn>
                           ))}
                         </nav>
                       </div>

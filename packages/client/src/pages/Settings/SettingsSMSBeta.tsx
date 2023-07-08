@@ -2,6 +2,7 @@ import { RadioGroup } from "@headlessui/react";
 import { ExclamationCircleIcon } from "@heroicons/react/20/solid";
 import { Input } from "components/Elements";
 import SaveSettings from "components/SaveSettings";
+import RenderWhenOn from "components/splitFeature/RenderWhenOn";
 import { ChangeEvent, FocusEvent, ReactNode, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useDebounce } from "react-use";
@@ -487,25 +488,30 @@ export default function SettingsSMSBeta() {
             </RadioGroup.Label>
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
               {Object.values(memoryOptions).map((option) => (
-                <RadioGroup.Option
+                <RenderWhenOn
+                  featureName={`settings-sms-${option.id}`}
                   key={option.name}
-                  value={option}
-                  className={({ active, checked }) =>
-                    classNames(
-                      option.inStock
-                        ? "cursor-pointer focus:outline-none"
-                        : "opacity-25 cursor-not-allowed",
-                      active ? "ring-2 ring-offset-2 ring-cyan-500" : "",
-                      checked
-                        ? "bg-cyan-600 border-transparent text-white hover:bg-cyan-700"
-                        : "bg-white border-gray-200 text-gray-900 hover:bg-gray-50",
-                      "border rounded-md py-3 px-3 flex items-center justify-center text-sm font-medium sm:flex-1"
-                    )
-                  }
-                  disabled={!option.inStock}
                 >
-                  <RadioGroup.Label as="span">{option.name}</RadioGroup.Label>
-                </RadioGroup.Option>
+                  <RadioGroup.Option
+                    key={option.name}
+                    value={option}
+                    className={({ active, checked }) =>
+                      classNames(
+                        option.inStock
+                          ? "cursor-pointer focus:outline-none"
+                          : "opacity-25 cursor-not-allowed",
+                        active ? "ring-2 ring-offset-2 ring-cyan-500" : "",
+                        checked
+                          ? "bg-cyan-600 border-transparent text-white hover:bg-cyan-700"
+                          : "bg-white border-gray-200 text-gray-900 hover:bg-gray-50",
+                        "border rounded-md py-3 px-3 flex items-center justify-center text-sm font-medium sm:flex-1"
+                      )
+                    }
+                    disabled={!option.inStock}
+                  >
+                    <RadioGroup.Label as="span">{option.name}</RadioGroup.Label>
+                  </RadioGroup.Option>
+                </RenderWhenOn>
               ))}
             </div>
           </RadioGroup>
