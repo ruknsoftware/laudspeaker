@@ -29,7 +29,7 @@ import { SplitSdk, SplitFactory } from "@splitsoftware/splitio-react";
 const factory: SplitIO.ISDK = SplitSdk({
   core: {
     authorizationKey: "pn5gq12e27h5ejbcjq0l3i8ah4blqauh6fhe",
-    key: JSON.parse(localStorage.getItem("userData"))?.email || "user",
+    key: "user",
   },
 });
 
