@@ -1,4 +1,8 @@
-import { SplitTreatments } from "@splitsoftware/splitio-react";
+import {
+  SplitFactory,
+  SplitTreatments,
+  useClient,
+} from "@splitsoftware/splitio-react";
 
 export default function RenderWhenOn({
   featureName,
@@ -7,18 +11,13 @@ export default function RenderWhenOn({
   featureName: string;
   children: React.ReactNode;
 }): JSX.Element {
-  return (
-    <SplitTreatments names={[featureName]}>
-      {({ treatments, isReady }) => {
-        if (!isReady) {
-          return <></>;
-        }
-        const { treatment } = treatments[featureName];
-        if (treatment === "on") {
-          return <>{children}</>;
-        }
-        return <></>;
-      }}
-    </SplitTreatments>
+  const client = useClient(
+    JSON.parse(localStorage.getItem("userData") || "{}")?.email || "user"
   );
+
+  const show = client?.getTreatment(featureName) === "on";
+
+  if (show) return <>{children}</>;
+
+  return <></>;
 }
