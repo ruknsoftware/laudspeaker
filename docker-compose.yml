@@ -37,6 +37,9 @@ services:
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     restart: on-failure
+    environment:
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=password
     ports:
       - "8123:8123"
       - "9000:9000"

@@ -18,6 +18,7 @@ import {
 } from '@/api/templates/entities/template.entity';
 import wait from '@/utils/wait';
 import { fetch } from 'undici';
+import { clickhouseDatetimeNow } from '@/common/helper/clickhouseDatetime';
 
 export enum MessageType {
   SMS = 'sms',
@@ -90,7 +91,7 @@ export class MessageSender {
       );
     },
     [MessageType.SLACK]: async (job) => {
-      await this.handleSlack(
+      return await this.handleSlack(
         job.templateID,
         job.accountID,
         job.stepID,
@@ -182,7 +183,7 @@ export class MessageSender {
       return [
         {
           stepId: stepID,
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           customerId: customerID,
           event: 'error',
           eventProvider: eventProvider,
@@ -221,7 +222,7 @@ export class MessageSender {
         ret = [
           {
             stepId: stepID,
-            createdAt: new Date().toUTCString(),
+            createdAt: clickhouseDatetimeNow(),
             customerId: customerID,
             event: 'sent',
             eventProvider: ClickHouseEventProvider.SENDGRID,
@@ -251,7 +252,7 @@ export class MessageSender {
         ret = [
           {
             stepId: stepID,
-            createdAt: new Date().toUTCString(),
+            createdAt: clickhouseDatetimeNow(),
             customerId: customerID,
             event: 'sent',
             eventProvider: ClickHouseEventProvider.MAILGUN,
@@ -329,7 +330,7 @@ export class MessageSender {
       return [
         {
           stepId: stepID,
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           customerId: customerID,
           event: 'error',
           eventProvider: smsProvider as ClickHouseEventProvider,
@@ -353,7 +354,7 @@ export class MessageSender {
         ret = [
           {
             stepId: stepID,
-            createdAt: new Date().toUTCString(),
+            createdAt: clickhouseDatetimeNow(),
             customerId: customerID,
             event: 'sent',
             eventProvider: ClickHouseEventProvider.TWILIO,
@@ -448,7 +449,7 @@ export class MessageSender {
         {
           userId: accountID,
           event: 'error',
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           eventProvider: ClickHouseEventProvider.FIREBASE,
           messageId: null,
           stepId: stepID,
@@ -474,7 +475,7 @@ export class MessageSender {
           {
             userId: accountID,
             event: 'error',
-            createdAt: new Date().toUTCString(),
+            createdAt: clickhouseDatetimeNow(),
             eventProvider: ClickHouseEventProvider.FIREBASE,
             messageId: null,
             stepId: stepID,
@@ -513,7 +514,7 @@ export class MessageSender {
       {
         stepId: stepID,
         customerId: customerID,
-        createdAt: new Date().toUTCString(),
+        createdAt: clickhouseDatetimeNow(),
         event: 'sent',
         eventProvider: ClickHouseEventProvider.FIREBASE,
         messageId: messageId,
@@ -571,7 +572,7 @@ export class MessageSender {
         {
           userId: accountID,
           event: 'sent',
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           eventProvider: ClickHouseEventProvider.SLACK,
           messageId: String(message.ts),
           stepId: stepID,
@@ -585,7 +586,7 @@ export class MessageSender {
         {
           userId: accountID,
           event: 'error',
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           eventProvider: ClickHouseEventProvider.SLACK,
           messageId: '',
           stepId: stepID,
@@ -677,7 +678,7 @@ export class MessageSender {
   //       await this.webhooksService.insertClickHouseMessages([
   //         {
   //           event: 'error',
-  //           createdAt: new Date().toUTCString(),
+  //           createdAt: clickhouseDatetimeNow(),
   //           eventProvider: ClickHouseEventProvider.WEBHOOKS,
   //           messageId: '',
   //           audienceId: job.data.audienceId,
@@ -696,7 +697,7 @@ export class MessageSender {
   //       await this.webhooksService.insertClickHouseMessages([
   //         {
   //           event: 'sent',
-  //           createdAt: new Date().toUTCString(),
+  //           createdAt: clickhouseDatetimeNow(),
   //           eventProvider: ClickHouseEventProvider.WEBHOOKS,
   //           messageId: '',
   //           audienceId: job.data.audienceId,
