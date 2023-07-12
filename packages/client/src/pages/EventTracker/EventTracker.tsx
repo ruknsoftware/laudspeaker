@@ -16,14 +16,14 @@ interface PosthogEvent {
   payload: string;
   createdAt: string;
   errorMessage?: string;
+  provider?: string;
 }
 
 const EventTracker = () => {
   const [loading, setLoading] = useState(false);
 
-  const [posthogEvents, setPosthogEvents] = useState<PosthogEvent[]>([]);
-  const [selectedPosthogEvent, setSelectedPosthogEvent] =
-    useState<PosthogEvent>();
+  const [allEvents, setAllEvents] = useState<PosthogEvent[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<PosthogEvent>();
 
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
@@ -38,23 +38,23 @@ const EventTracker = () => {
   };
 
   const loadData = async () => {
-    setSelectedPosthogEvent(undefined);
+    setSelectedEvent(undefined);
     setLoading(true);
     try {
       const { data } = await ApiService.get({
-        url: `/events/posthog-events?take=${itemsPerPage}&skip=${
+        url: `/events/all-events?take=${itemsPerPage}&skip=${
           itemsPerPage * currentPage
         }&search=${searchName}`,
       });
       const {
-        data: fetchedPosthogEvents,
+        data: fetchedEvents,
         totalPages,
       }: { data: PosthogEvent[]; totalPages: number } = data;
       setPagesCount(totalPages);
-      setPosthogEvents(fetchedPosthogEvents);
+      setAllEvents(fetchedEvents);
       setPossibleNames(
-        fetchedPosthogEvents
-          .map((posthogEvent) => posthogEvent.name)
+        fetchedEvents
+          .map((event) => event.name)
           .reduce(
             (acc, el) => (acc.includes(el) ? acc : acc.concat([el])),
             [] as string[]
@@ -107,18 +107,18 @@ const EventTracker = () => {
               <thead>
                 <tr className="border-[2px] border-gray-300 text-gray-800">
                   <th className="w-1/2 py-[10px]">Name</th>
+                  <th className="w-1/4 py-[10px]">Provider</th>
                   <th className="py-[10px]">Error</th>
                 </tr>
               </thead>
               <tbody>
-                {posthogEvents.map((posthogEvent) => (
+                {allEvents.map((event, i) => (
                   <tr
+                    key={i}
                     className={`border-[2px] border-gray-300 cursor-pointer hover:bg-cyan-100 hover:bg-opacity-30 ${
-                      selectedPosthogEvent === posthogEvent
-                        ? "ring-cyan-700 ring-2"
-                        : ""
+                      selectedEvent === event ? "ring-cyan-700 ring-2" : ""
                     }`}
-                    onClick={() => setSelectedPosthogEvent(posthogEvent)}
+                    onClick={() => setSelectedEvent(event)}
                   >
                     <td className="pl-[10px]">
                       <div className="flex">
@@ -129,19 +129,19 @@ const EventTracker = () => {
                           />
                         </div>
                         <div className="text-[14px] px-[10px] py-[15px]">
-                          <div className="font-bold">{posthogEvent.name}</div>
+                          <div className="font-bold">{event.name}</div>
                           <div className="font-normal text-gray-600">
-                            {posthogEvent.type}
+                            {event.type}
                           </div>
                           <div className="font-normal text-gray-600">
-                            {new Date(posthogEvent.createdAt).toUTCString()}
+                            {new Date(event.createdAt).toUTCString()}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="text-center">
-                      {posthogEvent.errorMessage || "-"}
-                    </td>
+                    <td className="text-center">{event.provider || "-"}</td>
+
+                    <td className="text-center">{event.errorMessage || "-"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -248,7 +248,7 @@ const EventTracker = () => {
                   enableLiveAutocompletion: true,
                   enableSnippets: true,
                 }}
-                value={selectedPosthogEvent?.payload}
+                value={selectedEvent?.payload}
                 onChange={() => {}}
               />
             </div>

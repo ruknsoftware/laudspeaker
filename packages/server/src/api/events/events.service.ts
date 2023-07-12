@@ -623,25 +623,119 @@ export class EventsService {
     const totalPages =
       Math.ceil(
         (await this.PosthogEventModel.count({
-          name: searchRegExp,
+          event: searchRegExp,
           ownerId: (<Account>account).id,
         }).exec()) / take
       ) || 1;
 
-    const posthogEvents = await this.PosthogEventModel.find({
-      name: searchRegExp,
+    const posthogEvents = (await this.PosthogEventModel.find({
+      event: searchRegExp,
       ownerId: (<Account>account).id,
     })
       .sort({ createdAt: 'desc' })
       .skip(skip)
       .limit(take > 100 ? 100 : take)
-      .exec();
+      .exec()) as any;
 
     return {
       data: posthogEvents.map((posthogEvent) => ({
         ...posthogEvent.toObject(),
         createdAt: posthogEvent._id.getTimestamp(),
       })),
+      totalPages,
+    };
+  }
+
+  async getCustomEvents(
+    account: Account,
+    session: string,
+    take = 100,
+    skip = 0,
+    search = ''
+  ) {
+    const searchRegExp = new RegExp(`.*${search}.*`, 'i');
+
+    const totalPages =
+      Math.ceil(
+        (await this.EventModel.count({
+          event: searchRegExp,
+          ownerId: (<Account>account).id,
+        }).exec()) / take
+      ) || 1;
+
+    const customEvents = (await this.EventModel.find({
+      event: searchRegExp,
+      ownerId: (<Account>account).id,
+    })
+      .sort({ createdAt: 'desc' })
+      .skip(skip)
+      .limit(take > 100 ? 100 : take)
+      .exec()) as [EventDocument & { event: string }];
+
+    return {
+      data: customEvents.map((customEvent) => ({
+        name: customEvent.event,
+        ...customEvent.toObject(),
+        createdAt: customEvent._id.getTimestamp(),
+      })),
+      totalPages,
+    };
+  }
+
+  async getAllEvents(
+    account: Account,
+    session: string,
+    take = 100,
+    skip = 0,
+    search = ''
+  ) {
+    const searchRegExp = new RegExp(`.*${search}.*`, 'i');
+
+    const totalPages =
+      Math.ceil(
+        (await this.EventModel.count({
+          event: searchRegExp,
+          ownerId: (<Account>account).id,
+        }).exec()) +
+          (await this.PosthogEventModel.count({
+            event: searchRegExp,
+            ownerId: (<Account>account).id,
+          }).exec())
+      ) || 1;
+
+    const customEvents = (await this.EventModel.find({
+      event: searchRegExp,
+      ownerId: (<Account>account).id,
+    })
+
+      .sort({ createdAt: 'desc' })
+      .skip(skip)
+      .limit(take > 100 ? 100 : take)
+      .exec()) as [EventDocument & { event: string }];
+
+    const posthogEvents = (await this.PosthogEventModel.find({
+      event: searchRegExp,
+      ownerId: (<Account>account).id,
+    })
+      .sort({ createdAt: 'desc' })
+      .skip(skip)
+      .limit(take > 100 ? 100 : take)
+      .exec()) as any;
+
+    return {
+      data: [
+        ...customEvents.map((customEvent) => ({
+          name: customEvent.event,
+          provider: 'custom',
+          ...customEvent.toObject(),
+          createdAt: customEvent._id.getTimestamp(),
+        })),
+        ...posthogEvents.map((posthogEvent) => ({
+          provider: 'posthog',
+          ...posthogEvent.toObject(),
+          createdAt: posthogEvent._id.getTimestamp(),
+        })),
+      ],
       totalPages,
     };
   }
