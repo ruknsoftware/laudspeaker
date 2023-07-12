@@ -384,28 +384,28 @@ export class TransitionProcessor extends WorkerHost {
             const installation = await this.slackService.getInstallation(
               customer
             );
-            /* await this.webhooksService.insertClickHouseMessages( */
-            await sender.process({
-              name: TemplateType.SLACK,
-              accountID: owner.id,
-              stepID: currentStep.id,
-              customerID: customer.id,
-              templateID: template.id,
-              methodName: 'chat.postMessage',
-              filteredTags: filteredTags,
-              args: {
-                token:
-                  process.env.ENVIRONMENT == 'development'
-                    ? process.env.slackBotToken
-                    : installation.installation.bot.token,
-                channel: customer.slackId,
-                text: await this.templatesService.parseApiCallTags(
-                  template.slackMessage,
-                  filteredTags
-                ),
-              },
-            });
-            /*  ); */
+            await this.webhooksService.insertClickHouseMessages(
+              await sender.process({
+                name: TemplateType.SLACK,
+                accountID: owner.id,
+                stepID: currentStep.id,
+                customerID: customer.id,
+                templateID: template.id,
+                methodName: 'chat.postMessage',
+                filteredTags: filteredTags,
+                args: {
+                  token:
+                    process.env.ENVIRONMENT == 'development'
+                      ? process.env.slackBotToken
+                      : installation.installation.bot.token,
+                  channel: customer.slackId,
+                  text: await this.templatesService.parseApiCallTags(
+                    template.slackMessage,
+                    filteredTags
+                  ),
+                },
+              })
+            );
             break;
           case TemplateType.SMS:
             let smsSid, smsToken, smsFrom;
