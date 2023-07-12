@@ -223,4 +223,23 @@ export class EventsController {
       search
     );
   }
+
+  @Get('/all-events')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
+  async getAllEvents(
+    @Req() { user }: Request,
+    @Query('take') take?: string,
+    @Query('skip') skip?: string,
+    @Query('search') search?: string
+  ) {
+    const session = randomUUID();
+    return this.eventsService.getAllEvents(
+      <Account>user,
+      session,
+      take && +take,
+      skip && +skip,
+      search
+    );
+  }
 }
