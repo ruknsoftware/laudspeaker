@@ -395,7 +395,9 @@ export class TransitionProcessor extends WorkerHost {
               filteredTags: filteredTags,
               args: {
                 token:
-                  /* installation.installation.bot.token */ process.env.slackBotToken,
+                  process.env.ENVIRONMENT == 'development'
+                    ? process.env.slackBotToken
+                    : installation.installation.bot.token,
                 channel: customer.slackId,
                 text: await this.templatesService.parseApiCallTags(
                   template.slackMessage,
