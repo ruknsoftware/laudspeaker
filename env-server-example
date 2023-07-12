@@ -65,7 +65,7 @@ TESTS_SMS_TO=[YOUR_VALUE]
 
 # temp
 
-slackBotToken=xoxb-5577890877329-5565313924354-FQWPvKFfY0FrgAJqKJlRz8Cp
+slackBotToken=
 
 #Optional for running single docker container
 #SERVE_CLIENT_FROM_NEST=true
