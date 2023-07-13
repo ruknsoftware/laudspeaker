@@ -50,6 +50,7 @@ import { StepsService } from './api/steps/steps.service';
 import { StepType } from './api/steps/types/step.interface';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { clickhouseDatetimeNow } from './common/helper/clickhouseDatetime';
 
 const BATCH_SIZE = 500;
 const KEYS_TO_SKIP = ['__v', '_id', 'audiences', 'ownerId'];
@@ -637,7 +638,7 @@ export class CronService {
                       messageId: rowObject.messageId,
                       event: message.status,
                       eventProvider: ClickHouseEventProvider.TWILIO,
-                      createdAt: new Date().toUTCString(),
+                      createdAt: clickhouseDatetimeNow(),
                       userId: accounts[j].id,
                       processed: false,
                     };
@@ -744,7 +745,7 @@ export class CronService {
                       messageId: rowObject.messageId,
                       event: message.status,
                       eventProvider: ClickHouseEventProvider.TWILIO,
-                      createdAt: new Date().toUTCString(),
+                      createdAt: clickhouseDatetimeNow(),
                       userId: accounts[j].id,
                       processed: false,
                     };

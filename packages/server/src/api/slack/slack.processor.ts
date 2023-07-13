@@ -8,6 +8,7 @@ import {
   ClickHouseEventProvider,
   WebhooksService,
 } from '../webhooks/webhooks.service';
+import { clickhouseDatetimeNow } from '@/common/helper/clickhouseDatetime';
 
 @Injectable()
 @Processor('slack', { removeOnComplete: { age: 0, count: 0 } })
@@ -43,7 +44,7 @@ export class SlackProcessor extends WorkerHost {
           {
             userId: job.data.accountId,
             event: 'error',
-            createdAt: new Date().toUTCString(),
+            createdAt: clickhouseDatetimeNow(),
             eventProvider: ClickHouseEventProvider.SLACK,
             messageId: '',
             audienceId: job.data.args.audienceId,

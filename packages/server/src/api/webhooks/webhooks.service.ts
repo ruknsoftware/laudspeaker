@@ -16,6 +16,7 @@ import formData from 'form-data';
 import axios from 'axios';
 import FormData from 'form-data';
 import { randomUUID } from 'crypto';
+import { clickhouseDatetimeNow } from '@/common/helper/clickhouseDatetime';
 
 export enum ClickHouseEventProvider {
   MAILGUN = 'mailgun',
@@ -228,7 +229,7 @@ export class WebhooksService {
         event: this.sendgridEventsMap[event] || event,
         eventProvider: ClickHouseEventProvider.SENDGRID,
         processed: false,
-        createdAt: new Date().toUTCString(),
+        createdAt: clickhouseDatetimeNow(),
       };
 
       this.logger.debug('Sendgrid webhook result:');
@@ -270,7 +271,7 @@ export class WebhooksService {
       event: SmsStatus,
       eventProvider: ClickHouseEventProvider.TWILIO,
       processed: false,
-      createdAt: new Date().toUTCString(),
+      createdAt: clickhouseDatetimeNow(),
     };
     await this.insertClickHouseMessages([clickHouseRecord]);
   }
@@ -332,7 +333,7 @@ export class WebhooksService {
       event: event,
       eventProvider: ClickHouseEventProvider.MAILGUN,
       processed: false,
-      createdAt: new Date().toUTCString(),
+      createdAt: clickhouseDatetimeNow(),
     };
 
     this.logger.debug('Mailgun webhooK result:');

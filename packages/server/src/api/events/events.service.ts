@@ -43,6 +43,7 @@ import {
 } from './schemas/posthog-event.schema';
 import { JourneysService } from '../journeys/journeys.service';
 import { Journey } from '../journeys/entities/journey.entity';
+import { clickhouseDatetimeNow } from '@/common/helper/clickhouseDatetime';
 
 @Injectable()
 export class EventsService {
@@ -507,7 +508,7 @@ export class EventsService {
         await this.EventModel.create({
           ...eventDto,
           ownerId: account.id,
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
         });
       }
 

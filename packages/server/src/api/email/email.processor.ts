@@ -15,6 +15,7 @@ import {
 import twilio from 'twilio';
 import { PostHog } from 'posthog-node';
 import * as admin from 'firebase-admin';
+import { clickhouseDatetimeNow } from '@/common/helper/clickhouseDatetime';
 
 export enum MessageType {
   SMS = 'sms',
@@ -175,7 +176,7 @@ export class MessageProcessor extends WorkerHost {
       await this.webhooksService.insertClickHouseMessages([
         {
           audienceId: job.data.audienceId,
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           customerId: job.data.customerId,
           event: 'error',
           eventProvider: job.data.eventProvider,
@@ -218,7 +219,7 @@ export class MessageProcessor extends WorkerHost {
           await this.webhooksService.insertClickHouseMessages([
             {
               audienceId: job.data.audienceId,
-              createdAt: new Date().toUTCString(),
+              createdAt: clickhouseDatetimeNow(),
               customerId: job.data.customerId,
               event: 'sent',
               eventProvider: ClickHouseEventProvider.SENDGRID,
@@ -248,7 +249,7 @@ export class MessageProcessor extends WorkerHost {
           await this.webhooksService.insertClickHouseMessages([
             {
               audienceId: job.data.audienceId,
-              createdAt: new Date().toUTCString(),
+              createdAt: clickhouseDatetimeNow(),
               customerId: job.data.customerId,
               event: 'sent',
               eventProvider: ClickHouseEventProvider.MAILGUN,
@@ -316,7 +317,7 @@ export class MessageProcessor extends WorkerHost {
       await this.webhooksService.insertClickHouseMessages([
         {
           audienceId: job.data.audienceId,
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           customerId: job.data.customerId,
           event: 'error',
           eventProvider: ClickHouseEventProvider.TWILIO,
@@ -339,7 +340,7 @@ export class MessageProcessor extends WorkerHost {
       await this.webhooksService.insertClickHouseMessages([
         {
           audienceId: job.data.audienceId,
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           customerId: job.data.customerId,
           event: 'sent',
           eventProvider: ClickHouseEventProvider.TWILIO,
@@ -408,7 +409,7 @@ export class MessageProcessor extends WorkerHost {
         {
           userId: job.data.accountId,
           event: 'error',
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           eventProvider: ClickHouseEventProvider.FIREBASE,
           messageId: null,
           audienceId: job.data.args.audienceId,
@@ -463,7 +464,7 @@ export class MessageProcessor extends WorkerHost {
         {
           audienceId: job.data.audienceId,
           customerId: job.data.customerId,
-          createdAt: new Date().toUTCString(),
+          createdAt: clickhouseDatetimeNow(),
           event: 'sent',
           eventProvider: ClickHouseEventProvider.FIREBASE,
           messageId: messageId,
