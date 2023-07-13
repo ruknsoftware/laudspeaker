@@ -17,6 +17,7 @@ import {
   WebhookMethod,
 } from '../templates/entities/template.entity';
 import { TemplatesService } from '../templates/templates.service';
+import { clickhouseDatetimeNow } from '@/common/helper/clickhouseDatetime';
 
 @Processor('webhooks', { removeOnComplete: { age: 0, count: 0 } })
 @Injectable()
@@ -179,7 +180,7 @@ export class WebhooksProcessor extends WorkerHost {
         await this.webhooksService.insertClickHouseMessages([
           {
             event: 'error',
-            createdAt: new Date().toUTCString(),
+            createdAt: clickhouseDatetimeNow(),
             eventProvider: ClickHouseEventProvider.WEBHOOKS,
             messageId: '',
             audienceId: job.data.audienceId,
@@ -199,7 +200,7 @@ export class WebhooksProcessor extends WorkerHost {
         await this.webhooksService.insertClickHouseMessages([
           {
             event: 'sent',
-            createdAt: new Date().toUTCString(),
+            createdAt: clickhouseDatetimeNow(),
             eventProvider: ClickHouseEventProvider.WEBHOOKS,
             messageId: '',
             audienceId: job.data.audienceId,

@@ -108,6 +108,12 @@ export class EventsProcessor extends WorkerHost {
     await queryRunner.startTransaction();
     const transactionSession = await this.connection.startSession();
     await transactionSession.startTransaction();
+
+    //if job.data.event.source is null, we assume it is a custom event
+    if (!job.data.event.source) {
+      job.data.event.source = ProviderTypes.Custom;
+    }
+
     try {
       this.debug(
         `${JSON.stringify({ jobData: job.data })}`,
@@ -404,9 +410,11 @@ export class EventsProcessor extends WorkerHost {
                 branches: steps[stepIndex].metadata.branches,
                 event: job.data.event,
               })}`,
+
               this.process.name,
               job.data.session
             );
+
             if (
               eventEvaluation.every((element) => {
                 return element === true;
@@ -427,13 +435,19 @@ export class EventsProcessor extends WorkerHost {
           if (JSON.parse(stepToQueue.customers[i]).customerID === customer.id)
             found = true;
         }
-        if (!found) throw new Error('Customer has not yet arrived in step.');
-        else {
+        if (!found) {
+          this.warn(
+            'Customer has not yet arrived in step.',
+            this.process.name,
+            job.data.session
+          );
+        } else {
           this.debug(
             `${JSON.stringify({ stepToQueue, event: job.data.event })}`,
             this.process.name,
             job.data.session
           );
+
           await this.transitionQueue.add(stepToQueue.type, {
             step: stepToQueue,
             branch: branch,
