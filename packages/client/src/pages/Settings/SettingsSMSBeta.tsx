@@ -161,7 +161,11 @@ export default function SettingsSMSBeta() {
       url: `/sms/possible-phone-numbers?smsAccountSid=${smsAccountSid}&smsAuthToken=${smsAuthToken}`,
     });
 
-    setPossibleNumbers(data || []);
+    if (!data.success) {
+      toast.error(data.message);
+    } else {
+      setPossibleNumbers(data || []);
+    }
   };
 
   useDebounce(

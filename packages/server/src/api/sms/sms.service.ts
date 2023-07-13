@@ -74,10 +74,16 @@ export class SmsService {
     session: string
   ) {
     const twilioClient = twilio(smsAccountSid, smsAuthToken);
-    const results = await twilioClient.incomingPhoneNumbers.list({
-      limit: 20,
-    });
-
-    return results.map((item) => item.phoneNumber);
+    try {
+      const results = await twilioClient.incomingPhoneNumbers.list({
+        limit: 20,
+      });
+      return results.map((item) => item.phoneNumber);
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Unable to fetch phone numbers from Twilio',
+      };
+    }
   }
 }
