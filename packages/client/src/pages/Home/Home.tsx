@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import ApiService from "services/api.service";
 import Account from "types/Account";
 import TokenService from "../../services/token.service";
+import { useClient } from "@splitsoftware/splitio-react";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -81,6 +82,10 @@ const Home = () => {
       handleCSVFile(file);
     }
   };
+
+  const client = useClient(
+    JSON.parse(localStorage.getItem("userData") || "{}")?.email || "user"
+  );
 
   return (
     <div>
@@ -178,7 +183,13 @@ const Home = () => {
                 <div className="w-full bg-white flex flex-wrap rounded-md items-stretch justify-center mt-[80px]">
                   <div
                     className="w-1/2 border-r-[1px] border-b-[1px] border-[#E8EAED] p-[20px] cursor-pointer hover:bg-gray-100"
-                    onClick={() => navigate("/onboarding")}
+                    onClick={() => {
+                      const showOnboarding = client?.getTreatment("onboarding");
+
+                      if (showOnboarding === "on") {
+                        navigate("/onboarding");
+                      }
+                    }}
                   >
                     <div className="h-[80px] flex justify-between items-start">
                       <div className="text-[#518983] bg-[#F2FDFA] w-10 h-10 rounded-md flex justify-center items-center">
@@ -227,7 +238,13 @@ const Home = () => {
                   </div>
                   <div
                     className="w-1/2 border-b-[1px] border-[#E8EAED] p-[20px] cursor-pointer hover:bg-gray-100"
-                    onClick={() => navigate("/flow")}
+                    onClick={() => {
+                      const showJourney = client?.getTreatment("journeys");
+
+                      if (showJourney === "on") {
+                        navigate("/flow");
+                      }
+                    }}
                   >
                     <div className="h-[80px] flex justify-between items-start">
                       <div className="text-[#7635C7] bg-[#F9F5FE] w-10 h-10 rounded-md flex justify-center items-center">
@@ -274,7 +291,13 @@ const Home = () => {
                   </div>
                   <div
                     className="w-full border-r-[1px] border-b-[1px] border-[#E8EAED] p-[20px] cursor-pointer hover:bg-gray-100"
-                    onClick={() => navigate("/templates/modal/test_example")}
+                    onClick={() => {
+                      const showTemplate = client?.getTreatment("campaigns");
+
+                      if (showTemplate === "on") {
+                        navigate("/templates/modal/test_example");
+                      }
+                    }}
                   >
                     <div className="h-[80px] flex justify-between items-start">
                       <div className="text-[#076da2] bg-[#f0f9ff] w-10 h-10 rounded-md flex justify-center items-center">
@@ -321,7 +344,14 @@ const Home = () => {
                   </div>
                   <div
                     className="w-full border-r-[1px] border-b-[1px] border-[#E8EAED] p-[20px] cursor-pointer hover:bg-gray-100"
-                    onClick={() => setIsCSVImportModalOpen(true)}
+                    onClick={() => {
+                      const showDataImport =
+                        client?.getTreatment("integrations");
+
+                      if (showDataImport === "on") {
+                        navigate("/integrations");
+                      }
+                    }}
                   >
                     <div className="h-[80px] flex justify-between items-start">
                       <div className="text-[#076da2] bg-[#f0f9ff] w-10 h-10 rounded-md flex justify-center items-center">
