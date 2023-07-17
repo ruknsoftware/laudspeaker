@@ -136,7 +136,7 @@ const Login: FC<LoginProps> = ({ setShowWelcomeBanner }) => {
                 </button>
               </div>
             </form>
-            <p className="pt-[24px] mb-[34px] text-center">
+            <p className="pt-[24px] text-center">
               Want to create an account?
               <CustomLink
                 href="/signup"
@@ -145,56 +145,6 @@ const Login: FC<LoginProps> = ({ setShowWelcomeBanner }) => {
                 Sign Up
               </CustomLink>
             </p>
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-2 text-gray-500">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-6 grid grid-cols-3 gap-3">
-                <div className="relative grayscale">
-                  <Tooltip content="coming soon">
-                    <a
-                      href="#"
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
-                    >
-                      <span className="sr-only">Sign in with Google</span>
-                      <img src={googleIcon} className="max-h-[30px]" />
-                    </a>
-                  </Tooltip>
-                </div>
-
-                <div className="relative grayscale">
-                  <Tooltip content="coming soon">
-                    <a
-                      href="#"
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
-                    >
-                      <span className="sr-only">Sign in with Gitlab</span>
-                      <img src={gitlabIcon} className="max-h-[30px]" />
-                    </a>
-                  </Tooltip>
-                </div>
-
-                <div className="relative grayscale">
-                  <Tooltip content="coming soon">
-                    <a
-                      href="#"
-                      className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
-                    >
-                      <span className="sr-only">Sign in with GitHub</span>
-                      <img src={githubIcon} className="max-h-[30px]" />
-                    </a>
-                  </Tooltip>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
