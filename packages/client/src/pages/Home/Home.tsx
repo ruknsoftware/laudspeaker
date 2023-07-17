@@ -349,7 +349,7 @@ const Home = () => {
                         client?.getTreatment("integrations");
 
                       if (showDataImport === "on") {
-                        navigate("/integrations");
+                        setIsCSVImportModalOpen(true);
                       }
                     }}
                   >
