@@ -617,13 +617,9 @@ const RouteComponent: React.FC = () => {
         <Route
           path="*"
           element={
-            <Protected>
-              <VerificationProtected>
-                <DrawerLayout>
-                  <JourneyTablev2 />
-                </DrawerLayout>
-              </VerificationProtected>
-            </Protected>
+            <div className="flex justify-center items-center h-screen">
+              <h1 className="text-center text-4xl">404 Page not found</h1>
+            </div>
           }
         />
       </Routes>
