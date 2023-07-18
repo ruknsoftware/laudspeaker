@@ -266,7 +266,7 @@ export class MessageProcessor extends WorkerHost {
       if (job.data.trackingEmail) {
         this.phClient.capture({
           distinctId: job.data.trackingEmail,
-          event: 'message sent',
+          event: 'message_sent',
           properties: {
             type: 'email',
             audience: job.data.audienceId,
@@ -353,7 +353,7 @@ export class MessageProcessor extends WorkerHost {
       if (job.data.trackingEmail) {
         this.phClient.capture({
           distinctId: job.data.trackingEmail,
-          event: 'message sent',
+          event: 'message_sent',
           properties: {
             type: 'sms',
             audience: job.data.audienceId,
@@ -476,7 +476,7 @@ export class MessageProcessor extends WorkerHost {
       if (job.data.trackingEmail) {
         this.phClient.capture({
           distinctId: job.data.trackingEmail,
-          event: 'message sent',
+          event: 'message_sent',
           properties: {
             type: 'firebase',
             audience: job.data.audienceId,
