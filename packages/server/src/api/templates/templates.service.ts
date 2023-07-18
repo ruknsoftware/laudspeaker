@@ -707,6 +707,9 @@ export class TemplatesService extends QueueEventsHost {
     str: string,
     filteredTags: { [key: string]: any } = {}
   ) {
+
+    if(!str) return "";
+
     const matches = str.match(/\[\{\[\s[^\s]+;[^\s]+\s\]\}\]/);
 
     if (!matches) return str;
