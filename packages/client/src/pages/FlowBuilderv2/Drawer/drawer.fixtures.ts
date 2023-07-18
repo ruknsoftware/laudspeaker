@@ -12,6 +12,7 @@ import {
   CustomModalIcon,
   UserAttributeIcon,
 } from "pages/FlowBuilderv2/Icons";
+import { FlowBuilderDrawerFixture } from "./FlowBuilderDrawer";
 
 export enum DrawerAction {
   EMAIL = "email",
@@ -28,15 +29,7 @@ export enum DrawerAction {
   USER_ATTRIBUTE = "userAttribute",
 }
 
-const flowBuilderDrawerFixtures: {
-  groupName: string;
-  children: {
-    id: DrawerAction;
-    icon: JSX.Element;
-    text: string;
-    disabled?: boolean;
-  }[];
-}[] = [
+const flowBuilderDrawerFixtures: FlowBuilderDrawerFixture[] = [
   {
     groupName: "Messages & Step",
     children: [
@@ -74,7 +67,6 @@ const flowBuilderDrawerFixtures: {
         id: DrawerAction.JUMP_TO,
         icon: JumpToIcon(),
         text: "Jump To",
-        disabled: true,
       },
       {
         id: DrawerAction.EXIT,

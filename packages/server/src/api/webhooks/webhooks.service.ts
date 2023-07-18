@@ -17,6 +17,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { randomUUID } from 'crypto';
 import { clickhouseDatetimeNow } from '@/common/helper/clickhouseDatetime';
+import { Step } from '../steps/entities/step.entity';
 
 export enum ClickHouseEventProvider {
   MAILGUN = 'mailgun',
@@ -79,8 +80,8 @@ export class WebhooksService {
   constructor(
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: Logger,
-    @InjectRepository(Audience)
-    private audienceRepository: Repository<Audience>,
+    @InjectRepository(Step)
+    private stepRepository: Repository<Step>,
     @InjectRepository(Account)
     private accountRepository: Repository<Account>
   ) {
@@ -162,25 +163,25 @@ export class WebhooksService {
     session: string,
     data?: any[]
   ) {
-    let audience: Audience = null;
+    let step: Step = null;
 
     for (const item of data) {
-      if (!item.audienceId) continue;
+      if (!item.stepId) continue;
 
-      audience = await this.audienceRepository.findOne({
+      step = await this.stepRepository.findOne({
         where: {
-          id: item.audienceId,
+          id: item.stepId,
         },
         relations: ['owner'],
       });
 
-      if (audience) break;
+      if (step) break;
     }
 
-    if (!audience) return;
+    if (!step) return;
     const {
       owner: { sendgridVerificationKey },
-    } = audience;
+    } = step;
 
     if (!sendgridVerificationKey)
       throw new BadRequestException(
@@ -203,7 +204,7 @@ export class WebhooksService {
 
     for (const item of data) {
       const {
-        audienceId,
+        stepId,
         customerId,
         templateId,
         event,
@@ -211,7 +212,7 @@ export class WebhooksService {
         timestamp,
       } = item;
       if (
-        !audienceId ||
+        !stepId ||
         !customerId ||
         !templateId ||
         !event ||
@@ -221,8 +222,8 @@ export class WebhooksService {
         continue;
 
       const clickHouseRecord: ClickHouseMessage = {
-        userId: audience.owner.id,
-        audienceId,
+        userId: step.owner.id,
+        stepId,
         customerId,
         templateId: String(templateId),
         messageId: sg_message_id.split('.')[0],
@@ -232,9 +233,6 @@ export class WebhooksService {
         createdAt: clickhouseDatetimeNow(),
       };
 
-      this.logger.debug('Sendgrid webhook result:');
-      console.dir(clickHouseRecord, { depth: null });
-
       messagesToInsert.push(clickHouseRecord);
     }
     await this.insertClickHouseMessages(messagesToInsert);
@@ -242,13 +240,13 @@ export class WebhooksService {
 
   public async processTwilioData(
     {
-      audienceId,
+      stepId,
       customerId,
       templateId,
       SmsStatus,
       MessageSid,
     }: {
-      audienceId: string;
+      stepId: string;
       customerId: string;
       templateId: string;
       SmsStatus: string;
@@ -256,15 +254,15 @@ export class WebhooksService {
     },
     session: string
   ) {
-    const audience = await this.audienceRepository.findOne({
+    const step = await this.stepRepository.findOne({
       where: {
-        id: audienceId,
+        id: stepId,
       },
       relations: ['owner'],
     });
     const clickHouseRecord: ClickHouseMessage = {
-      userId: audience.owner.id,
-      audienceId,
+      userId: step.owner.id,
+      stepId,
       customerId,
       templateId: String(templateId),
       messageId: MessageSid,
@@ -283,7 +281,7 @@ export class WebhooksService {
         event: string;
         message: { headers: { 'message-id': string } };
         'user-variables': {
-          audienceId: string;
+          stepId: string;
           customerId: string;
           templateId: string;
           accountId: string;
@@ -303,7 +301,7 @@ export class WebhooksService {
       message: {
         headers: { 'message-id': id },
       },
-      'user-variables': { audienceId, customerId, templateId, accountId },
+      'user-variables': { stepId, customerId, templateId, accountId },
     } = body['event-data'];
 
     const account = await this.accountRepository.findOneBy({ id: accountId });
@@ -322,11 +320,17 @@ export class WebhooksService {
       throw new ForbiddenException('Invalid signature');
     }
 
-    if (!audienceId || !customerId || !templateId || !id) return;
+    this.debug(
+      `${JSON.stringify({ webhook: body })}`,
+      this.processMailgunData.name,
+      session
+    );
+
+    if (!stepId || !customerId || !templateId || !id) return;
 
     const clickHouseRecord: ClickHouseMessage = {
       userId: account.id,
-      audienceId,
+      stepId,
       customerId,
       templateId: String(templateId),
       messageId: id,
@@ -336,8 +340,11 @@ export class WebhooksService {
       createdAt: clickhouseDatetimeNow(),
     };
 
-    this.logger.debug('Mailgun webhooK result:');
-    console.dir(clickHouseRecord, { depth: null });
+    this.debug(
+      `${JSON.stringify({ clickhouseMessage: clickHouseRecord })}`,
+      this.processMailgunData.name,
+      session
+    );
 
     await this.insertClickHouseMessages([clickHouseRecord]);
   }
