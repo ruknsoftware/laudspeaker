@@ -621,7 +621,7 @@ const OnboardingSandbox: FC<OnboardingSandboxProps> = ({
   return (
     <>
       {currentSandboxFixture.header}
-      <div className="bg-[#F3F4F6] rounded-[25px] h-full overflow-hidden flex relative">
+      <div className="bg-[#F3F4F6] rounded-[25px] h-screen overflow-hidden flex relative ">
         {currentStep === SandboxStep.FINISH && <Confetti />}
 
         <div className="py-[20px] pl-[20px]">
