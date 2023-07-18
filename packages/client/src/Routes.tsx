@@ -592,7 +592,9 @@ const RouteComponent: React.FC = () => {
             <Protected>
               <VerificationProtected>
                 <DrawerLayout>
-                  <Homev2 />
+                  <RenderWhenOn featureName="home-v2" elseChildren={<Home />}>
+                    <Homev2 />
+                  </RenderWhenOn>
                 </DrawerLayout>
               </VerificationProtected>
             </Protected>
@@ -603,7 +605,16 @@ const RouteComponent: React.FC = () => {
           element={
             <Protected>
               <VerificationProtected>
-                <Onboardingv2 />
+                <RenderWhenOn
+                  featureName="home-v2"
+                  elseChildren={
+                    <DrawerLayout>
+                      <OnboardingBeta />
+                    </DrawerLayout>
+                  }
+                >
+                  <Onboardingv2 />
+                </RenderWhenOn>
               </VerificationProtected>
             </Protected>
           }
