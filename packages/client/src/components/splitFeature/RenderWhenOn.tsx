@@ -7,9 +7,11 @@ import {
 export default function RenderWhenOn({
   featureName,
   children,
+  elseChildren = <></>,
 }: {
   featureName: string;
   children: React.ReactNode;
+  elseChildren?: React.ReactNode;
 }): JSX.Element {
   const client = useClient(
     JSON.parse(localStorage.getItem("userData") || "{}")?.email || "user"
@@ -17,7 +19,11 @@ export default function RenderWhenOn({
 
   const show = client?.getTreatment(featureName) === "on";
 
-  if (show) return <>{children}</>;
+  if (show) {
+    return <>{children}</>;
+  } else if (elseChildren) {
+    return <>{elseChildren}</>;
+  }
 
   return <></>;
 }

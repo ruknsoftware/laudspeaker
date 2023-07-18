@@ -53,6 +53,8 @@ import PeopleTablev2 from "pages/PeopleTablev2";
 import SegmentTablev2 from "pages/SegmentTablev2";
 import { useTreatments } from "@splitsoftware/splitio-react";
 import CustomModalBuilder from "pages/CustomModalBuilder";
+import RenderWhenOn from "components/splitFeature/RenderWhenOn";
+import Home from "pages/Home";
 
 interface IProtected {
   children: ReactElement;
@@ -236,7 +238,9 @@ const RouteComponent: React.FC = () => {
             <Protected>
               <VerificationProtected>
                 <DrawerLayout>
-                  <Homev2 />
+                  <RenderWhenOn featureName="home-v2" elseChildren={<Home />}>
+                    <Homev2 />
+                  </RenderWhenOn>
                 </DrawerLayout>
               </VerificationProtected>
             </Protected>
