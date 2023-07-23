@@ -8,6 +8,7 @@ import mongoose, {
 } from 'mongoose';
 import {
   BadRequestException,
+  forwardRef,
   HttpException,
   HttpStatus,
   Inject,
@@ -31,7 +32,6 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { createClient } from '@clickhouse/client';
-import { Workflow } from '../workflows/entities/workflow.entity';
 import { attributeConditions } from '../../fixtures/attributeConditions';
 import { getType } from 'tst-reflect';
 import { isDateString, isEmail } from 'class-validator';
@@ -40,9 +40,9 @@ import { SegmentsService } from '../segments/segments.service';
 import { AudiencesHelper } from '../audiences/audiences.helper';
 import { SegmentCustomers } from '../segments/entities/segment-customers.entity';
 import { AudiencesService } from '../audiences/audiences.service';
-import { WorkflowsService } from '../workflows/workflows.service';
 import * as _ from 'lodash';
 import { randomUUID } from 'crypto';
+import { JourneysService } from '../journeys/journeys.service';
 
 export type Correlation = {
   cust: CustomerDocument;
@@ -83,9 +83,10 @@ export class CustomersService {
     public accountsRepository: Repository<Account>,
     private readonly audiencesHelper: AudiencesHelper,
     private readonly audiencesService: AudiencesService,
-    @Inject(WorkflowsService)
-    private readonly workflowsService: WorkflowsService,
-    @InjectConnection() private readonly connection: mongoose.Connection
+    @Inject(forwardRef(() => JourneysService))
+    private readonly journeysService: JourneysService,
+    @InjectConnection()
+    private readonly connection: mongoose.Connection
   ) {
     this.CustomerModel.watch().on('change', async (data: any) => {
       const session = randomUUID();
@@ -222,81 +223,24 @@ export class CustomersService {
       ).exec();
     }
 
-    await this.dataSource.transaction(async (transactionManager) => {
-      // Already started (isEditable = false), dynamic (isDyanmic = true),push
-      // Not started (isEditable = true), dynamic (isDyanmic = true), push
-      const dynamicWkfs = await transactionManager.find(Workflow, {
-        where: {
-          owner: { id: account.id },
-          isDynamic: true,
-        },
-        relations: ['filter'],
-      });
-      for (let index = 0; index < dynamicWkfs.length; index++) {
-        const workflow = dynamicWkfs[index];
-        if (workflow.filter) {
-          if (
-            await this.audiencesHelper.checkInclusion(
-              ret,
-              workflow.filter.inclusionCriteria,
-              session
-            )
-          ) {
-            const audiences = await transactionManager.findBy(Audience, {
-              workflow: { id: workflow.id },
-            });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-            const primaryAudience = audiences.find(
-              (audience) => audience.isPrimary
-            );
-
-            await transactionManager.update(
-              Audience,
-              { owner: { id: account.id }, id: primaryAudience.id },
-              {
-                customers: primaryAudience.customers.concat(ret.id),
-              }
-            );
-          }
-        }
-      }
-      // Already started(isEditable = true), static(isDyanmic = false), don't push
-      // Not started(isEditable = false), static(isDyanmic = false), push
-      const staticWkfs = await transactionManager.find(Workflow, {
-        where: {
-          owner: { id: account.id },
-          isDynamic: false,
-        },
-        relations: ['filter'],
-      });
-      for (let index = 0; index < staticWkfs.length; index++) {
-        const workflow = staticWkfs[index];
-        if (workflow.filter) {
-          if (
-            await this.audiencesHelper.checkInclusion(
-              ret,
-              workflow.filter.inclusionCriteria,
-              session
-            )
-          ) {
-            const audiences = await transactionManager.findBy(Audience, {
-              workflow: { id: workflow.id },
-              isEditable: false,
-            });
-
-            const primaryAudience = audiences.find((item) => item.isPrimary);
-
-            await transactionManager.update(
-              Audience,
-              { owner: { id: account.id }, id: primaryAudience.id },
-              {
-                customers: primaryAudience.customers.concat(ret.id),
-              }
-            );
-          }
-        }
-      }
-    });
+    try {
+      await this.journeysService.enrollCustomer(
+        account,
+        createdCustomer,
+        queryRunner,
+        transactionSession,
+        session
+      );
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
 
     return ret;
   }
@@ -1240,7 +1184,7 @@ export class CustomersService {
       );
 
       if (!correlation.found)
-        await this.workflowsService.enrollCustomer(
+        await this.journeysService.enrollCustomer(
           account,
           correlation.cust,
           queryRunner,

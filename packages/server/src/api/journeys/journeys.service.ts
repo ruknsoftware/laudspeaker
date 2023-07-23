@@ -72,10 +72,6 @@ export enum JourneyStatus {
   DRAFT = 'Draft',
 }
 
-function isObjKey<T extends object>(key: PropertyKey, obj: T): key is keyof T {
-  return key in obj;
-}
-
 @Injectable()
 export class JourneysService {
   private clickhouseClient = createClient({
