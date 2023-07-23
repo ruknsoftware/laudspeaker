@@ -161,11 +161,11 @@ export default function SettingsSMSBeta() {
       url: `/sms/possible-phone-numbers?smsAccountSid=${smsAccountSid}&smsAuthToken=${smsAuthToken}`,
     });
 
-    if (!data.success) {
-      toast.error(data.message);
-    } else {
-      setPossibleNumbers(data || []);
+    if (data.message && !data.success) {
+      return toast.error(data.message);
     }
+    setPossibleNumbers(data || []);
+    setFormData({ ...formData, smsFrom: data[0] || "" });
   };
 
   useDebounce(
@@ -322,9 +322,10 @@ export default function SettingsSMSBeta() {
                 }`}
                 onBlur={handleBlur}
               >
-                <option value={formData.smsFrom}>{formData.smsFrom}</option>
                 {possibleNumbers.map((item) => (
-                  <option value={item}>{item}</option>
+                  <option value={item} selected={formData.smsFrom === item}>
+                    {item}
+                  </option>
                 ))}
               </select>
               {showErrors.smsFrom && twilioErrors.smsFrom.length > 0 && (

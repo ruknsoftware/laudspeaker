@@ -73,8 +73,8 @@ export class SmsService {
     smsAuthToken: string,
     session: string
   ) {
-    const twilioClient = twilio(smsAccountSid, smsAuthToken);
     try {
+      const twilioClient = twilio(smsAccountSid, smsAuthToken);
       const results = await twilioClient.incomingPhoneNumbers.list({
         limit: 20,
       });
