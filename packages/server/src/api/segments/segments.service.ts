@@ -22,6 +22,7 @@ import { SegmentCustomers } from './entities/segment-customers.entity';
 import { Segment, SegmentType } from './entities/segment.entity';
 import { InjectConnection } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
+import { JourneysService } from '../journeys/journeys.service';
 
 @Injectable()
 export class SegmentsService {
@@ -36,7 +37,10 @@ export class SegmentsService {
     private customersService: CustomersService,
     private workflowsService: WorkflowsService,
     private readonly audiencesHelper: AudiencesHelper,
+    @Inject(forwardRef(() => JourneysService))
+    private readonly journeysService: JourneysService,
     @InjectConnection() private readonly connection: mongoose.Connection
+    
   ) {}
 
   public async findOne(account: Account, id: string, session: string) {
@@ -256,7 +260,7 @@ export class SegmentsService {
       const customer = await this.customersService.CustomerModel.findById(
         customerId
       ).exec();
-      await this.workflowsService.enrollCustomer(
+      await this.journeysService.enrollCustomer(
         account,
         customer,
         runner,
@@ -428,7 +432,7 @@ export class SegmentsService {
     const transactionSession = await this.connection.startSession();
     transactionSession.startTransaction();
     try {
-      await this.workflowsService.enrollCustomer(
+      await this.journeysService.enrollCustomer(
         account,
         customer,
         runner,

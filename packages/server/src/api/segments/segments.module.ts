@@ -8,12 +8,14 @@ import { SegmentCustomers } from './entities/segment-customers.entity';
 import { Segment } from './entities/segment.entity';
 import { SegmentsController } from './segments.controller';
 import { SegmentsService } from './segments.service';
+import { JourneysModule } from '../journeys/journeys.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Segment, SegmentCustomers]),
     forwardRef(() => CustomersModule),
     forwardRef(() => WorkflowsModule),
+    JourneysModule,
   ],
   controllers: [SegmentsController],
   providers: [SegmentsService, AudiencesHelper],
