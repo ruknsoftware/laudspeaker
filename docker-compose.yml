@@ -19,6 +19,8 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
+    volumes:
+      - ./data/postgres-data:/var/lib/postgresql/data
     networks:
       - laudspeaker_default
 
@@ -31,6 +33,8 @@ services:
       interval: 10s
       start_period: 30s
     command: "--bind_ip_all --replSet rs0"
+    volumes:
+      - ./data/mongo-data:/data/db
     networks:
       - laudspeaker_default
 
@@ -43,6 +47,8 @@ services:
     ports:
       - "8123:8123"
       - "9000:9000"
+    volumes:
+      - ./data/clickhouse-data:/var/lib/clickhouse
     networks:
       - laudspeaker_default
 
